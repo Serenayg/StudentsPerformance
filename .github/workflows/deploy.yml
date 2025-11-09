@@ -39,15 +39,10 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           HEROKU_EMAIL: s.goler@3013@student.nu.edu
         run: |
-          # Heroku CLI, 
           heroku auth:whoami
           heroku git:remote -a students-performance-894f173c0a91
           git remote -v
 
-
       - name: Push to Heroku (force)
         run: git push heroku HEAD:main -f
-
-      #     heroku_email: ${{ secrets.HEROKU_EMAIL }}
-      #     dontautocreate: true
-      #     dontuseforce: 1
+          
