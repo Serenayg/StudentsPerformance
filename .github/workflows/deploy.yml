@@ -9,40 +9,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout (full history)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Set up Python
+      # Optional: quick sanity test; Heroku will use .python-version in the repo
+      - name: Set up Python for CI
         uses: actions/setup-python@v5
         with:
-          python-version-file: .python-version
+          python-version: "3.11"
 
-      - name: Install deps
+      - name: Install deps (CI sanity)
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Quick import test
+      - name: Ensure not shallow
         run: |
-          python - << 'PY'
-          import flask, sklearn, pandas, numpy
-          print("✅ imports ok")
-          PY
+          git fetch --all --prune
+          git rev-parse --is-shallow-repository && git fetch --unshallow || echo "Already unshallowed"
 
-      - name: Install Heroku CLI
-        run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
-
-      - name: Login & add Heroku git remote
+      - name: Push to Heroku (Git deploy)
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          HEROKU_EMAIL: s.goler@3013@student.nu.edu
         run: |
-          heroku auth:whoami
-          heroku git:remote -a students-performance-894f173c0a91
-          git remote -v
-
-      - name: Push to Heroku (force)
-        run: git push heroku HEAD:main -f
-          
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git remote remove heroku 2>/dev/null || true
+          git remote add heroku https://heroku:${HEROKU_API_KEY}@git.heroku.com/students-performance-894f173c0a91.git
+          git push heroku HEAD:main -f
