@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Student Performance Prediction</title>
+</head>
+<body>
+  <h2>Student Performance Prediction</h2>
+
+  <form action="/predict" method="post">
+    <label>Math Score:</label>
+    <input type="number" step="any" name="math" required><br><br>
+
+    <label>Reading Score:</label>
+    <input type="number" step="any" name="reading" required><br><br>
+
+    <label>Writing Score:</label>
+    <input type="number" step="any" name="writing" required><br><br>
+
+    <button type="submit">Predict Group</button>
+  </form>
+
+  {% if prediction_text %}
+    <h3>{{ prediction_text }}</h3>
+  {% endif %}
+</body>
+</html>
