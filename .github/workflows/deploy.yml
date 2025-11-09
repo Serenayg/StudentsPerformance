@@ -11,13 +11,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version-file: .python-version
 
-      - name: Install dependencies
+      - name: Install deps
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -26,16 +28,26 @@ jobs:
         run: |
           python - << 'PY'
           import flask, sklearn, pandas, numpy
-          print("✅ All imports OK")
+          print("✅ imports ok")
           PY
 
       - name: Install Heroku CLI
         run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
 
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@v3.13.15
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: students-performance
-          heroku_email: s.goler3012@student.nu.edu
-          dontautocreate: true
+      - name: Login & add Heroku git remote
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_EMAIL: s.goler@3013@student.nu.edu
+        run: |
+          # Heroku CLI, 
+          heroku auth:whoami
+          heroku git:remote -a students-performance-894f173c0a91
+          git remote -v
+
+
+      - name: Push to Heroku (force)
+        run: git push heroku HEAD:main -f
+
+      #     heroku_email: ${{ secrets.HEROKU_EMAIL }}
+      #     dontautocreate: true
+      #     dontuseforce: 1
