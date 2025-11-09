@@ -22,12 +22,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run import test
+      - name: Quick import test
         run: |
           python - << 'PY'
           import flask, sklearn, pandas, numpy
-          print("✅ All imports OK!")
+          print("✅ All imports OK")
           PY
+
+      - name: Install Heroku CLI
+        run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
 
       - name: Deploy to Heroku
         uses: akhileshns/heroku-deploy@v3.13.15
@@ -35,3 +38,4 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: students-performance
           heroku_email: s.goler3012@student.nu.edu
+          dontautocreate: true
